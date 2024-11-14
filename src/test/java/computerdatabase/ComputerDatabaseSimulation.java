@@ -51,7 +51,7 @@ public class ComputerDatabaseSimulation extends Simulation {
 
     //    Write a scenario
     ScenarioBuilder users = scenario("Users").exec(search, browse);
-    ScenarioBuilder admins = scenario("Admins").exec(search, browse, edit, tryMaxEdit);
+    ScenarioBuilder admins = scenario("Admins").exec(search, browse, tryMaxEdit);
 
 
     //    Define the injection profile
