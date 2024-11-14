@@ -8,6 +8,7 @@ import io.gatling.javaapi.http.HttpProtocolBuilder;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
+import static io.gatling.javaapi.http.HttpDsl.status;
 
 public class ComputerDatabaseSimulation extends Simulation {
 
@@ -26,9 +27,27 @@ public class ComputerDatabaseSimulation extends Simulation {
             )).pause(1).exec(http(
                     "Select").get("#{computerUrl}")).pause(1);
 
-    ChainBuilder browse = null;
-    ChainBuilder edit = null;
-    
+
+    private static ChainBuilder goToPage(int page) {
+        return exec(http("Page " + page).get("/computers?p=" + page)).pause(1);
+    }
+
+    //    Looping
+    ChainBuilder browse = repeat(5, "n").on(
+            exec(http("Page #{n}").get("/computers?p=#{n}")).pause(1)
+    );
+
+    //    Check and failure management
+    ChainBuilder edit =
+            exec(http("Form").get("/computers/new")).pause(1).exec(http("Post").post("/computers").formParam("name",
+                    "computer xyz").check(
+                    status().is(session -> 200 + java.util.concurrent.ThreadLocalRandom.current().nextInt(2))
+            ));
+
+    ChainBuilder tryMaxEdit = tryMax(2).on( // 1
+            exec(edit)
+    ).exitHereIfFailed(); // 2
+
     //    Write a scenario
     ScenarioBuilder users = scenario("Users").exec(search, browse);
     ScenarioBuilder admins = scenario("Admins").exec(search, browse, edit);
