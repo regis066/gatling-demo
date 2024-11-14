@@ -28,9 +28,10 @@ public class ComputerDatabaseSimulation extends Simulation {
                     "Select").get("#{computerUrl}")).pause(1);
 
 
-//    private static ChainBuilder goToPage(int page) {
-//        return exec(http("Page " + page).get("/computers?p=" + page)).pause(1);
-//    }
+/*
+    private static ChainBuilder goToPage(int page) {
+     return exec(http("Page " + page).get("/computers?p=" + page)).pause(1);
+ }*/
 
     //    Looping
     ChainBuilder browse = repeat(5, "n").on(
@@ -50,7 +51,7 @@ public class ComputerDatabaseSimulation extends Simulation {
 
     //    Write a scenario
     ScenarioBuilder users = scenario("Users").exec(search, browse);
-    ScenarioBuilder admins = scenario("Admins").exec(search, browse, edit);
+    ScenarioBuilder admins = scenario("Admins").exec(search, browse, edit, tryMaxEdit);
 
 
     //    Define the injection profile
